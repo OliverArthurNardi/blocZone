@@ -2,7 +2,7 @@
 
 :warning: **IMPORTANT!!!!**
 
-🚧 This project is still under heavy development, which means it is not ready for production environment, as the idea is still in the proof of concept stage.
+🚧 **THIS PROJECT IS STILL UNDER HEAVY DEVELOPMENT, WHICH MEANS IT IS NOT READY FOR A PRODUCTION ENVIRONMENT, AS THE IDEA IS STILL IN THE PROOF OF CONCEPT STAGE.**
 
 BlocZone Core is a state management library built for JavaScript and TypeScript developers. This library provides the foundation for building reactive applications with an emphasis on maintainability and clear separation of concerns.
 

@@ -33,12 +33,10 @@ Ensure you have the latest version of Node.js, npm, and pnpm installed on your s
    pnpm install
    ```
 
-4. Start the development server.
+4. Run the suit in watch mode
    ```
-   pnpm start
+   pnpm core:test
    ```
-
-Your local copy of the BlocZone Core library is now running and ready for development!
 
 ## API Reference
 Please refer to the [API_REFERENCE.md](./API_REFERENCE.md) for detailed information on how to use BlocZone Core and EventEmitterZone.

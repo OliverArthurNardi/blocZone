@@ -1,6 +1,6 @@
 export type Subscription<S> = (state: S) => void
-export type EventReceiver = (event: string, payload: any) => void
-export type Dispatch = (event: string, payload: any) => void
+export type EventReceiver = (event: string, payload: unknown) => void
+export type Dispatch = (event: string, payload: unknown) => void
 
 /**
  * A generic interface for a state management object.

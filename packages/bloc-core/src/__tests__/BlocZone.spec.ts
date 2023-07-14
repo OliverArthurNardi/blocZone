@@ -45,7 +45,7 @@ describe('createBlocZone', () => {
     const initialState: AppState = { count: 0 }
     const bloc = createBlocZone(initialState)
 
-    const subscriber: Subscription<AppState> = (state) => {
+    const subscriber: Subscription<AppState> = () => {
       /* no-op */
     }
 

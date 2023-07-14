@@ -13,7 +13,8 @@
 		}
 	},
   "scripts": {
-    "build": "tsc --build tsconfig.json && jest && vite build",
+    "build": "tsc --build tsconfig.json && vite build",
+		"ci:test": "jest --coverage",
     "test": "jest --watch",
 		"test:cov": "jest --coverage --watch",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path ../../.gitignore",

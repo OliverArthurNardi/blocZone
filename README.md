@@ -68,3 +68,7 @@ We highly value your contributions! For guidelines on how to contribute to the p
 ## Code of Conduct
 
 We are committed to fostering an open and welcoming environment. Please see our [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) for more details.
+
+## Authors
+
+- [@OliverArthur](https://github.com/OliverArthur)

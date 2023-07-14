@@ -72,3 +72,13 @@ We are committed to fostering an open and welcoming environment. Please see our 
 ## Authors
 
 - [@OliverArthur](https://github.com/OliverArthur)
+
+
+## Screenshot
+
+#### First use case example
+
+![First use case](./screenshots/blocZone.png)
+
+#### Second use case example
+![Second use case](./screenshots/blocZoneAndEventEmitter.png)

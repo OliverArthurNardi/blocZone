@@ -25,5 +25,5 @@ jobs:
         version: latest
     - run: pnpm install
     - run: pnpm run core:lint
-    - run: pnpm run core:test
+    - run: pnpm run core:ci-test
     - run: pnpm run core:build

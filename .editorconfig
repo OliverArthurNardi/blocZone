@@ -12,5 +12,8 @@ charset = utf-8
 [html]
 indent_size = 4
 
+[*.{yml,yaml}]
+indent_style = space
+
 [*.md]
 trim_trailing_whitespace = false

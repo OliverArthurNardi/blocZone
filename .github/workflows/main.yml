@@ -24,6 +24,6 @@ jobs:
       with:
         version: latest
     - run: pnpm install
-    - run: pnpm run core:lint --if-present
-    - run: pnpm run core:test --if-present
-    - run: pnpm run core:build --if-present
+    - run: pnpm run core:lint
+    - run: pnpm run core:test
+    - run: pnpm run core:build

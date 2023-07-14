@@ -1,0 +1,6 @@
+vite-env.ts
+vite.config.ts
+tsconfig.json
+jest.config.ts
+src/
+coverage/

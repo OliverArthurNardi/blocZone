@@ -1,4 +1,4 @@
-import type { Subscription, BlocZone } from './types'
+import type { Subscription, BlocZone } from '../types'
 
 /**
  * Creates a BlocZone with the provided initial state.
@@ -7,7 +7,7 @@ import type { Subscription, BlocZone } from './types'
  * @param {S} initialState - The initial state of the BlocZone.
  * @returns {BlocZone<S>} The created BlocZone.
  */
-export default function createBlocZone<S extends object>(initialState: S): BlocZone<S> {
+export function createBlocZone<S extends object>(initialState: S): BlocZone<S> {
 	/** @type {WeakMap<object, Subscription<S>>} Mapping of object keys to listener functions */
 	const _listeners = new WeakMap<object, Subscription<S>>()
 

@@ -1,6 +1,6 @@
 import { describe, test, expect } from '@jest/globals'
-import createBlocZone from '../BlocZone'
-import type { Subscription } from '../types'
+import { createBlocZone } from '../BlocZone'
+import type { Subscription } from '../../types'
 
 describe('createBlocZone', () => {
   interface AppState {

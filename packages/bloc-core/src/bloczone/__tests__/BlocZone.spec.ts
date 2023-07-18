@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals'
+import { describe, test, expect, jest } from '@jest/globals'
 import { createBlocZone } from '../BlocZone'
 import type { Subscription } from '../../types'
 
@@ -57,14 +57,16 @@ describe('createBlocZone', () => {
     }).not.toThrowError()
   })
 
-  test('should throw an error when trying to unsubscribe an object that is not subscribed', () => {
+  test('should warn when trying to unsubscribe an object that is not subscribed ', () => {
     const initialState: AppState = { count: 0 }
     const bloc = createBlocZone(initialState)
 
     const unknownObject = {}
 
-    expect(() => {
-      bloc.unsubscribe(unknownObject)
-    }).toThrowError('Object is not subscribed to this Bloc')
+		jest.spyOn(console, 'warn')
+
+		bloc.unsubscribe(unknownObject)
+
+		expect(console.warn).toHaveBeenCalledWith('Object is not subscribed to this Bloc')
   })
 })

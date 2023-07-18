@@ -6,7 +6,7 @@ export default defineConfig({
 		lib: {
 			entry: 'src/index.ts',
 			name: 'bloczone',
-			fileName: (format) => `index.js`
+			fileName: () => `index.js`
 		},
 	},
 	plugins: [

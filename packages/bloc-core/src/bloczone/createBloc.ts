@@ -1,6 +1,7 @@
 import { createBlocZone } from './BlocZone'
 import type { BlocZone, BlocId } from '../types'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const blocRegistry: Map<BlocId, WeakRef<BlocZone<any>>> = new Map()
 
 /**
@@ -9,8 +10,8 @@ const blocRegistry: Map<BlocId, WeakRef<BlocZone<any>>> = new Map()
  * FinalizationRegistry can provide a way to request a cleanup when a bloc is
  * no longer referenced. This will allow to do garbage collection on blocs.
  */
-const finalizationRegistry = new FinalizationRegistry((blocId) => {
-  blocRegistry.delete(blocId as BlocId)
+const finalizationRegistry = new FinalizationRegistry((blocId: BlocId) => {
+  blocRegistry.delete(blocId)
 })
 
 /**

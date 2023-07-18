@@ -1,7 +1,7 @@
 export type Subscription<S> = (state: S) => void
 export type EventReceiver = (event: string, payload: unknown) => void
 export type Dispatch = (event: string, payload: unknown) => void
-export type Middleware<S> = (state: S, action: string, args: any[], next: () => void) => void;
+export type Middleware<S> = (state: S, action: string, args: unknown[], next: () => void) => void;
 export type BlocId = string | symbol
 
 

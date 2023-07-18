@@ -44,7 +44,7 @@ export function createBloc<S extends object>(blocId: BlocId, initialState: S): B
  * @param blocId - The bloc id to get.
  * @returns The bloc with the given id.
  */
-export function getBloc<S extends object>(blocId: BlocId): BlocZone<S> | undefined {
+export function useBloc<S extends object>(blocId: BlocId): BlocZone<S> | undefined {
   const blocRef = blocRegistry.get(blocId)
   return blocRef ? blocRef.deref() as BlocZone<S> : undefined
 }

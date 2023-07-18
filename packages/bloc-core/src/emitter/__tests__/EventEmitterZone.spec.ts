@@ -2,41 +2,42 @@ import { describe, test, expect } from '@jest/globals'
 import { createEventEmitter } from '../EventEmitterZone'
 
 describe('createEventEmitter', () => {
-  const eventEmitter = createEventEmitter()
+	interface TestEvents {
+		testEvent: string
+	}
 
-  test('should call handler when event is emitted', () => {
-    const eventName = 'testEvent'
-    const payload = 'testPayload'
+	const eventEmitter = createEventEmitter<TestEvents>()
 
-    let receivedEvent: string | null = null
-    let receivedPayload: unknown | null = null
+	test('should call handler when event is emitted', () => {
+		const eventName: keyof TestEvents = 'testEvent'
+		const payload = 'testPayload'
 
-    const handler = (event: string, payload: unknown) => {
-      receivedEvent = event
-      receivedPayload = payload
-    }
+		let receivedPayload: TestEvents[keyof TestEvents] | null = null
 
-    eventEmitter.on(eventName, handler)
-    eventEmitter.emit(eventName, payload)
+		const handler = (payload: TestEvents[keyof TestEvents]) => {
+			receivedPayload = payload
+		}
 
-    expect(receivedEvent).toEqual(eventName)
-    expect(receivedPayload).toEqual(payload)
-  })
+		eventEmitter.on(eventName, handler)
+		eventEmitter.emit(eventName, payload)
 
-  test('should stop calling handler after it has been removed', () => {
-    const eventName = 'testEvent'
-    const payload = 'testPayload'
+		expect(receivedPayload).toEqual(payload)
+	})
 
-    let callCount = 0
-    const handler = () => {
-      callCount++
-    }
+	test('should stop calling handler after it has been removed', () => {
+		const eventName: keyof TestEvents = 'testEvent'
+		const payload = 'testPayload'
 
-    eventEmitter.on(eventName, handler)
-    eventEmitter.emit(eventName, payload) // increments callCount
-    eventEmitter.off(eventName, handler)
-    eventEmitter.emit(eventName, payload) // should not increment callCount
+		let callCount = 0
+		const handler = () => {
+			callCount++
+		}
 
-    expect(callCount).toEqual(1)
-  })
+		eventEmitter.on(eventName, handler)
+		eventEmitter.emit(eventName, payload) // increments callCount
+		eventEmitter.off(eventName, handler)
+		eventEmitter.emit(eventName, payload) // should not increment callCount
+
+		expect(callCount).toEqual(1)
+	})
 })

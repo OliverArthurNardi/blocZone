@@ -1,43 +1,35 @@
 import type { EventReceiver, EventEmitterProps } from '../types'
 
 /**
- * Creates an event emitter that allows for subscribing to, unsubscribing from, and emitting events.
- * 
- * @returns {EventEmitterProps} The event emitter with `on`, `off`, and `emit` methods.
+ * Creates an event emitter object.
+ *
+ * @template E - The type of the events object.
+ * @returns An event emitter object with `on`, `off`, and `emit` methods.
  */
-export function createEventEmitter(): EventEmitterProps {
-	const handlers: Map<string, EventReceiver[]> = new Map()
+export function createEventEmitter<E extends object>(): EventEmitterProps<E> {
+	const handlers: Record<string, Array<EventReceiver<unknown>>> = {}
 
-	const on = (event: string, handler: EventReceiver) => {
-		const currentHandlers = handlers.get(event) || []
-		handlers.set(event, [...currentHandlers, handler])
+	const on: EventEmitterProps<E>['on'] = <K extends keyof E>(
+		event: K,
+		handler: EventReceiver<E[K]>
+	) => {
+		const currentHandlers = handlers[event as string] || []
+		handlers[event as string] = [...currentHandlers, handler as unknown as EventReceiver<unknown>]
 	}
-	
-	const off = (event: string, handler: EventReceiver) => {
-		const currentHandlers = handlers.get(event) || []
-		if (!currentHandlers) {
-			console.warn(`Event: ${event} not found`)
-			return
-		}
-		handlers.set(
-			event,
-			currentHandlers.filter((h) => h !== handler)
+
+	const off: EventEmitterProps<E>['off'] = <K extends keyof E>(
+		event: K,
+		handler: EventReceiver<E[K]>
+	) => {
+		const currentHandlers = handlers[event as string] || []
+		handlers[event as string] = currentHandlers.filter(
+			(h) => h !== (handler as unknown as EventReceiver<unknown>)
 		)
 	}
-	
-	const emit = (event: string, payload: unknown) => {
-		const currentHandlers = handlers.get(event) || []
-		if (!currentHandlers) {
-			console.warn(`Event: ${event} not found`)
-			return
-		}
-		currentHandlers.forEach((handler) => {
-			try {
-				handler(event, payload)
-			} catch (error) {
-				console.error(`Error executing handler for event '${event}':`, error)
-			}
-		})
+
+	const emit: EventEmitterProps<E>['emit'] = <K extends keyof E>(event: K, payload: E[K]) => {
+		const currentHandlers = handlers[event as string] || []
+		currentHandlers.forEach((handler) => (handler as EventReceiver<unknown>)(payload))
 	}
 
 	return {

@@ -1,8 +1,8 @@
-import createBlocZone from '@bloczone/core/src/BlocZone'
+import { useBloc } from '@bloczone/core/src/bloczone'
 
-const bloc = createBlocZone({ count: 0 })
+const blocCounter = useBloc<{ count: number }>('COUNTER')
 
-export default class StateDisplayerElement extends HTMLElement {
+export default class StateDisplayedElement extends HTMLElement {
 	constructor() {
 		super()
 
@@ -25,19 +25,24 @@ export default class StateDisplayerElement extends HTMLElement {
 
 		const state = document.createElement('div')
 		state.className = 'state'
-		state.textContent = `${bloc.getState().count}`
 
-		bloc.subscribe(this, (nextState) => {
-			state.textContent = `${nextState.count}`
-		})
+		if (blocCounter) {
+			state.textContent = `${blocCounter.getState().count}`
+
+			blocCounter.subscribe(this, (nextState) => {
+				state.textContent = `${nextState.count}`
+			})
+		}
 
 		shadow.appendChild(style)
 		shadow.appendChild(state)
 	}
 
 	disconnectedCallback() {
-		bloc.unsubscribe(this)
+		if (blocCounter) {
+			blocCounter.unsubscribe(this)
+		}
 	}
 }
 
-customElements.define('state-displayer', StateDisplayerElement)
+customElements.define('state-displayed', StateDisplayedElement)

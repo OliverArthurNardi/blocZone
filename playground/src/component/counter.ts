@@ -1,8 +1,13 @@
-import createBlocZone from '@bloczone/core/src/BlocZone'
-import createEventEmitter from '@bloczone/core/src/EventEmitterZone'
+import { createEventEmitter } from '@bloczone/core/src/emitter'
 
-const bloc = createBlocZone({ count: 0 })
-const emitter = createEventEmitter()
+import { blocCounter } from '../store/blocCounter'
+
+interface CounterEvents {
+	increment: { count: number }
+	decrement: { count: number }
+}
+
+const emitter = createEventEmitter<CounterEvents>()
 
 export default class CounterElement extends HTMLElement {
 	constructor() {
@@ -31,19 +36,18 @@ export default class CounterElement extends HTMLElement {
 		counter.className = 'counter'
 		counter.textContent = 'increment me'
 
-		emitter.on('increment', (_event, payload) => {
-			if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
-				bloc.setState(payload as { count: number })
-			}
+		emitter.on('increment', ({ count }) => {
+			blocCounter.setState({ count })
 		})
 
 		counter.addEventListener('click', () => {
-			emitter.emit('increment', { count: bloc.getState().count + 1 })
+			emitter.emit('increment', { count: blocCounter.getState().count + 1 })
 		})
 
-		bloc.subscribe(this, (nextState) => {
-			this.counter = `${nextState.count}`
-		})
+		if (blocCounter) {
+			const { count } = blocCounter.getState()
+			this.counter = `${count}`
+		}
 
 		shadow.appendChild(style)
 		shadow.appendChild(counter)
@@ -58,10 +62,8 @@ export default class CounterElement extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		bloc.unsubscribe(this)
+		blocCounter.unsubscribe(this)
 	}
 }
 
 customElements.define('counter-element', CounterElement)
-
-

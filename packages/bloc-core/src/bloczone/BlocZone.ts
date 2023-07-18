@@ -44,14 +44,14 @@ export function createBlocZone<S extends object>(initialState: S): BlocZone<S> {
 	const setState = (newState: S) => Object.assign(state, newState)
 	const subscribe = (obj: object, listener: Subscription<S>): void => {
 		if (_listenerKeys.has(obj)) {
-			throw new Error('Object is already subscribed to this Bloc')
+			console.warn('Object is already subscribed to this Bloc')
 		}
 		_listeners.set(obj, listener)
 		_listenerKeys.set(obj, null)
 	}
 	const unsubscribe = (obj: object): void => {
 		if (!_listenerKeys.has(obj)) {
-			throw new Error('Object is not subscribed to this Bloc')
+			console.warn('Object is not subscribed to this Bloc')
 		}
 		_listeners.delete(obj)
 		_listenerKeys.delete(obj)

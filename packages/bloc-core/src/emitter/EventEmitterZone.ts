@@ -1,11 +1,11 @@
-import type { EventReceiver, EventEmitterProps } from './types'
+import type { EventReceiver, EventEmitterProps } from '../types'
 
 /**
  * Creates an event emitter that allows for subscribing to, unsubscribing from, and emitting events.
  * 
  * @returns {EventEmitterProps} The event emitter with `on`, `off`, and `emit` methods.
  */
-export default function createEventEmitter(): EventEmitterProps {
+export function createEventEmitter(): EventEmitterProps {
 	const handlers: Map<string, EventReceiver[]> = new Map()
 
 	const on = (event: string, handler: EventReceiver) => {

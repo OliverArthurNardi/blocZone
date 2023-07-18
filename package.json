@@ -10,7 +10,9 @@
     "core:test": "pnpm --filter @bloczone/core test",
     "core:coverage": "pnpm --filter @bloczone/core test:cov",
     "core:lint": "pnpm --filter @bloczone/core lint",
-    "core:format": "pnpm --filter @bloczone/core format"
+    "core:format": "pnpm --filter @bloczone/core format",
+		"playground:dev": "pnpm --filter @bloczone/playground dev",
+		"playground:build": "pnpm --filter @bloczone/playground build"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "1.3.2",

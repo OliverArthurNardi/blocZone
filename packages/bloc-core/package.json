@@ -2,16 +2,9 @@
   "name": "@bloczone/core",
   "version": "1.0.0",
   "description": "Core library for managing state using the BLoC pattern",
-	"type": "module",
-  "main": "dist/index.umd.js",
-	"module": "dist/index.es.js",
+  "main": "dist/index.js",
   "types": "dist/types.d.ts",
-	"exports": {
-		".": {
-			"import": "./dist/index.es.js",
-			"require": "./dist/index.umd.js"
-		}
-	},
+  "sideEffects": false,
   "scripts": {
     "build": "tsc --build tsconfig.json && vite build",
 		"ci:test": "jest --coverage",

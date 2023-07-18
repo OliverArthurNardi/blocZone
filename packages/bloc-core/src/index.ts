@@ -1,2 +1,2 @@
-export { default as createBlocZone } from './BlocZone'
-export { default as createEventEmitter } from './EventEmitterZone'
+export { createBloc, getBloc } from './bloczone'
+export { createEventEmitter } from './emitter'

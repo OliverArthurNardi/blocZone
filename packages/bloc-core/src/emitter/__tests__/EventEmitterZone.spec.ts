@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals'
-import createEventEmitter from '../EventEmitterZone'
+import { createEventEmitter } from '../EventEmitterZone'
 
 describe('createEventEmitter', () => {
   const eventEmitter = createEventEmitter()

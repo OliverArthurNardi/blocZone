@@ -1,8 +1,8 @@
 import { describe, test, expect, jest } from '@jest/globals'
-import { createBloc, getBloc } from '../createBloc'
+import { createBloc, useBloc } from '../createBloc'
 import type { BlocZone } from '../../types'
 
-describe('createBloc and getBloc', () => {
+describe('createBloc and useBloc', () => {
 	test('should create a bloc with the provided initial state', () => {
 		const blocId = 'testBloc'
 		const initialState = { count: 0 }
@@ -16,14 +16,14 @@ describe('createBloc and getBloc', () => {
 		const initialState = { count: 0 }
 		const createdBloc: BlocZone<typeof initialState> = createBloc(blocId, initialState)
 
-		const retrievedBloc = getBloc(blocId)
+		const retrievedBloc = useBloc(blocId)
 
 		expect(retrievedBloc).toBe(createdBloc)
 	})
 
 	test('should undefined if the bloc does not exist', () => {
 		const blocId = 'testBloc3'
-		const retrievedBloc = getBloc(blocId)
+		const retrievedBloc = useBloc(blocId)
 
 		expect(retrievedBloc).toBeUndefined()
 	})
@@ -34,7 +34,7 @@ describe('createBloc and getBloc', () => {
 		const initialState = { count: 0 }
 		const createdBloc: BlocZone<typeof initialState> = createBloc(blocId, initialState)
 
-		const retrievedBloc = getBloc(blocId)
+		const retrievedBloc = useBloc(blocId)
 
 		expect(retrievedBloc).toBe(createdBloc)
 	})

@@ -30,10 +30,11 @@ describe('createBlocZone', () => {
 
     let updatedState: AppState | null = null
     const subscriber: Subscription<AppState> = (state) => {
+			console.log('state', state)
       updatedState = state
     }
 
-    bloc.subscribe({}, subscriber)
+    bloc.subscribe({}, subscriber, ['count'])
 
     const newState: AppState = { count: 5 }
     bloc.setState(newState)
@@ -51,7 +52,7 @@ describe('createBlocZone', () => {
 
     const object = {}
 
-    bloc.subscribe(object, subscriber)
+    bloc.subscribe(object, subscriber, ['count'])
     expect(() => {
       bloc.unsubscribe(object)
     }).not.toThrowError()

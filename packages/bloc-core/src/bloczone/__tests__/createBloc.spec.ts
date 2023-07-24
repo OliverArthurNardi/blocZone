@@ -41,14 +41,14 @@ describe('createBloc and useBloc', () => {
 
 	test('should subscribe to the bloc and get called when state is updated', () => {
 		const blocId = 'testBloc4'
-
 		const initialState = { count: 0 }
 		const bloc: BlocZone<typeof initialState> = createBloc(blocId, initialState)
 
 		const subscriber = jest.fn()
-		bloc.subscribe({}, subscriber) // We use an empty object here as we just need an object for the subscriber
+		bloc.subscribe({}, subscriber, ['count'])
 
 		const newState = { count: 1 }
+
 		bloc.setState(newState)
 
 		expect(subscriber).toHaveBeenCalledWith(newState)
@@ -61,7 +61,7 @@ describe('createBloc and useBloc', () => {
 		const bloc: BlocZone<typeof initialState> = createBloc(blocId, initialState)
 
 		const subscriber = jest.fn()
-		bloc.subscribe(subscriber, (newState) => newState.count)
+		bloc.subscribe(subscriber, (newState) => newState.count, ['count'])
 
 		bloc.unsubscribe(subscriber)
 

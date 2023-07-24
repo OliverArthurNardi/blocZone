@@ -9,7 +9,7 @@ import type { Subscription, BlocZone } from '../types'
  */
 export function createBlocZone<S extends object>(initialState: S): BlocZone<S> {
 	/** @type {WeakMap<object, Subscription<S>>} Mapping of object keys to listener functions */
-	const _listeners = new WeakMap<object, Subscription<S>>()
+	const _subscriberCallbacks = new WeakMap<object, Subscription<S>>()
 
 	/** @type {Set<object>} Set of objects that are subscribed to this Bloc */
 	const _listenerKeys = new Set<object>()
@@ -25,7 +25,7 @@ export function createBlocZone<S extends object>(initialState: S): BlocZone<S> {
 		activeEffect = null
 	}
 
-	const _track = (target: object, key: keyof S) => {
+	const _trackListeners = (target: object, key: keyof S) => {
 		if (activeEffect) {
 			let deps = _dependencies.get(target)
 			if (!deps) {
@@ -35,27 +35,54 @@ export function createBlocZone<S extends object>(initialState: S): BlocZone<S> {
 		}
 	}
 
-	const _trigger = (target: object, key: keyof S) => {
-		const deps = _dependencies.get(target)
-		if (deps && deps.has(key)) {
-			const listener = _listeners.get(target as S)
-			if (listener) {
-				listener(target as S)
+	const _notifyListeners = (target: object, key: keyof S) => {
+		_listenerKeys.forEach((obj) => {
+			const deps = _dependencies.get(obj)
+			if (deps && deps.has(key)) {
+				const listener = _subscriberCallbacks.get(obj)
+				if (listener) {
+					effect(() => listener(target as S))
+				}
 			}
-		}
+		})
 	}
+
+	const _subscribeObject = (obj: object, listener: Subscription<S>, keys: Array<keyof S>) => {
+		if (_checkSubscription(obj, false)) {
+			return
+		}
+
+		_subscriberCallbacks.set(obj, listener)
+		_listenerKeys.add(obj)
+		_dependencies.set(obj, new Set(keys))
+		effect(() => {
+			keys.forEach((key) => state[key])
+			listener(state)
+		})
+	}
+
+	const _checkSubscription = (obj: object, shouldExist: boolean) => {
+		const exists = _listenerKeys.has(obj)
+		if (shouldExist && !exists) {
+			console.warn(`Object is not subscribed to this Bloc: ${obj}`)
+		} else if (!shouldExist && exists) {
+			console.warn(`Object is already subscribed to this Bloc: ${obj}`)
+		}
+		return exists
+	}
+
 
 	const state = new Proxy(initialState, {
 		get: (target, key) => {
 			const value = Reflect.get(target, key)
-			_track(state, key as keyof S)
+			_trackListeners(state, key as keyof S)
 			return value
 		},
 		set: (target, key, value) => {
 			const oldValue = target[key as keyof S]
+			Reflect.set(target, key, value)
 			if (oldValue !== value) {
-				Reflect.set(target, key, value)
-				_trigger(target, key as keyof S)
+				_notifyListeners(target, key as keyof S)
 			}
 			return true
 		}
@@ -72,46 +99,33 @@ export function createBlocZone<S extends object>(initialState: S): BlocZone<S> {
 		}
 		return rawState
 	}
-	const getState = (): S => state
+	const getState = (): S => {
+		const keys = Object.keys(state) as Array<keyof S>
+		for (const key of keys) {
+			state[key]
+		}
+		return state
+	}
 	const setState = (newState: Partial<S>) => {
 		for (const key in newState) {
 			state[key as keyof S] = newState[key as keyof S]!
-			_trigger(state, key as keyof S)
+			_notifyListeners(state, key as keyof S)
 		}
 	}
-	const subscribe = (target: object, listener: Subscription<S>, keys: Array<keyof S>): void => {
-		if (_listenerKeys.has(target)) {
-			console.warn('Object is already subscribed to this Bloc')
-		}
-		_listeners.set(target, listener)
-		_listenerKeys.add(target)
-		_dependencies.set(target, new Set(keys))
-		effect(() => {
-			keys.forEach((key) => state[key])
-			listener(state)
-		})
+	const subscribe = (obj: object, listener: Subscription<S>, keys: Array<keyof S>): void => {
+		_subscribeObject(obj, listener, keys)
 	}
 
 	const subscribeAll = (obj: object, listener: Subscription<S>): void => {
-		if (_listenerKeys.has(obj)) {
-			console.warn('Object is already subscribed to this Bloc')
-		}
-
 		const keys = Object.keys(state) as Array<keyof S>
-		_listeners.set(obj, listener)
-		_listenerKeys.add(obj)
-		_dependencies.set(obj, new Set(keys))
-		effect(() => {
-			keys.forEach((key) => state[key])
-			listener(state)
-		})
+		_subscribeObject(obj, listener, keys)
 	}
 
 	const unsubscribe = (obj: object): void => {
-		if (!_listenerKeys.has(obj)) {
-			console.warn('Object is not subscribed to this Bloc')
+		if (!_checkSubscription(obj, true)) {
+			return
 		}
-		_listeners.delete(obj)
+		_subscriberCallbacks.delete(obj)
 		_listenerKeys.delete(obj)
 	}
 

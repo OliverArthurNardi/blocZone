@@ -68,6 +68,6 @@ describe('createBlocZone', () => {
 
 		bloc.unsubscribe(unknownObject)
 
-		expect(console.warn).toHaveBeenCalledWith('Object is not subscribed to this Bloc')
+		expect(console.warn).toHaveBeenCalledWith(`Object is not subscribed to this Bloc: ${unknownObject}`)
   })
 })

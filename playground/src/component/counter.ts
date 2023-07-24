@@ -39,6 +39,7 @@ export default class CounterElement extends HTMLElement {
 	}
 
 
+
 	get counter() {
 		return this.getAttribute('counter') || '0'
 	}

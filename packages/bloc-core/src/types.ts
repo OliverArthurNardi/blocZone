@@ -40,7 +40,15 @@ export interface BlocZone<S> {
 	 * @param {object} obj - The object to observe.
 	 * @param {Subscription<S>} listener - The listener function to add.
 	 */
-	subscribe: (obj: object, listener: Subscription<S>) => void
+	subscribe: (obj: object, listener: Subscription<S>, keys: Array<keyof S>) => void
+	/**
+	 * Adds a listener function to the given object that will be called whenever the state changes.
+	 *
+	 * @param {object} obj - The object to observe.
+	 * @param {Subscription<S>} listener - The listener function to add.
+	 * @returns {void}
+	 */
+	subscribeAll: (obj: object, listener: Subscription<S>) => void
 	/**
 	 * Removes the listener function from the given object.
 	 *

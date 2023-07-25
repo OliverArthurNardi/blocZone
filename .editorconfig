@@ -9,6 +9,10 @@ indent_size = 2
 [*.{js,css,scss}]
 charset = utf-8
 
+[*.{js,ts,jsx,tsx,css,scss}]
+indent_style = space
+indent_size = 2
+
 [html]
 indent_size = 4
 

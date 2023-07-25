@@ -49,7 +49,7 @@ describe('createBloc and useBloc', () => {
 
 		const newState = { count: 1 }
 
-		bloc.setState(newState)
+		bloc.setState('countUpdate', newState)
 
 		expect(subscriber).toHaveBeenCalledWith(newState)
 	})
@@ -66,7 +66,8 @@ describe('createBloc and useBloc', () => {
 		bloc.unsubscribe(subscriber)
 
 		const newState = { count: 1 }
-		bloc.setState(newState)
+
+    bloc.setState('countUpdate', newState)
 
 		expect(subscriber).not.toHaveBeenCalledWith(newState)
 	})

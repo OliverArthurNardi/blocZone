@@ -7,7 +7,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc --build tsconfig.json && vite build",
-		"ci:test": "jest --coverage",
+		"ci:test": "jest --coverage --detectOpenHandles",
     "test": "jest --watch",
 		"test:cov": "jest --coverage --watch",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path ../../.gitignore",

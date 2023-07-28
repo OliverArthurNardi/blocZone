@@ -5,62 +5,55 @@ import type { Subscription, TargetKeys } from '../../types'
  *
  * @template S - The type of the state.
  *
- * @param getActiveEffect - A function that returns the current active effect.
- *
  * @returns The created subscription manager.
  */
-export default function SubscribeManager<S extends object>(getActiveEffect: () => Subscription<S> | null) {
-  const _subscriberCallbacks = new WeakMap<object, Subscription<S>>()
-  const _listenerKeys = new Set<object>()
-  const _dependencies = new WeakMap<object, Set<keyof S>>()
+export default function SubscribeManager<S extends object>() {
+  /** @type {WeakMap<object, Subscription<S>>} Mapping of object keys to listener functions */
+  const _subscriberCallbacks = new WeakMap<S, Subscription<S>>()
+  /** @type {Set<object>} Set of objects that are subscribed to this Bloc */
+  const _listenerKeys = new Set<S>()
+  /** @type {WeakMap<object, Set<keyof S>>} Mapping of object keys to the properties they are subscribed to */
+  const _dependencies = new WeakMap<S, Set<TargetKeys<S>>>()
 
-  /**
-   * Checks if target is a valid object and is already subscribed, throws an error if not.
-   *
-   * @param target - The target object.
-   */
-  const handleSubscriptionExceptions = (target: object) => {
+  let activeEffect: Subscription<S> | null = null
+
+  const handleSubscriptionExceptions = (target: S) => {
     if (typeof target !== 'object' || target === null) {
-      throw new Error(`Cannot subscribe to a non-object value. Received value of type ${typeof target}`)
+      throw new Error(
+        `Cannot subscribe to a non-object value. Received value of type ${typeof target}`
+      )
     }
 
     if (_dependencies.has(target)) {
-      console.warn(`Object ${target} is already subscribed. Skipping subscription.`)
+      console.warn(`Object is already subscribed. ${JSON.stringify(target)}`)
     }
   }
 
-  /**
-   * Subscribes a listener to changes in a key of the target object.
-   *
-   * @param target - The target object.
-   * @param key - The key in the target object.
-   * @param callback - The callback function.
-   */
-  const subscribe = (target: object, key: TargetKeys<S>, callback: Subscription<S>) => {
+  const effect = (eff: () => void) => {
+    activeEffect = eff
+    eff()
+    activeEffect = null
+  }
+
+  const subscribe = (target: S, key: TargetKeys<S>, callback: Subscription<S>) => {
     handleSubscriptionExceptions(target)
 
     if (!_dependencies.has(target)) {
       _dependencies.set(target, new Set())
     }
 
-    _dependencies.get(target)!.add(key as keyof S)
+    _dependencies.get(target)!.add(key)
     _subscriberCallbacks.set(target, callback)
     _listenerKeys.add(target)
   }
 
-  /**
-   * Unsubscribes a listener from changes in a key of the target object.
-   *
-   * @param target - The target object.
-   * @param key - The key in the target object.
-   */
-  const unsubscribe = (target: object, key: TargetKeys<S>) => {
+  const unsubscribe = (target: S, key: TargetKeys<S>) => {
     if (typeof target !== 'object' || target === null || !_subscriberCallbacks.has(target)) {
-      throw new Error(`Cannot unsubscribe from a non-subscribed object. Received value of type ${typeof target}`)
+      throw new Error(`Cannot unsubscribe. Invalid target received of type ${typeof target}`)
     }
 
     const dependencies = _dependencies.get(target)!
-    dependencies.delete(key as keyof S)
+    dependencies.delete(key)
 
     if (dependencies.size === 0) {
       _dependencies.delete(target)
@@ -69,40 +62,29 @@ export default function SubscribeManager<S extends object>(getActiveEffect: () =
     }
   }
 
-  /**
-   * Tracks the dependencies of the active effect on the keys of the target object.
-   *
-   * @param target - The target object.
-   * @param key - The key in the target object.
-   */
-  const trackListeners = (target: object, key: TargetKeys<S>) => {
-    if (!target || typeof target !== 'object') {
-      console.error(`Track listeners called with invalid target: ${target}, target must be an object`)
-    }
-
-    const activeEffect = getActiveEffect()
+  const trackListeners = (target: S, key: TargetKeys<S>) => {
     if (activeEffect) {
       let deps = _dependencies.get(target)
       if (!deps) {
         _dependencies.set(target, (deps = new Set()))
       }
-      deps.add(key as keyof S)
+      deps.add(key)
     }
   }
 
-  /**
-   * Notifies all listeners that are subscribed to changes in a key of the target object.
-   *
-   * @param target - The target object.
-   * @param key - The key in the target object.
-   */
-  const notifyListeners = (target: object, key: TargetKeys<S>) => {
+  const notifyListeners = (target: S, key: TargetKeys<S>) => {
     _listenerKeys.forEach((obj) => {
-      const deps = _dependencies.get(obj)
-      if (deps && deps.has(key as keyof S)) {
-        const listener = _subscriberCallbacks.get(obj)
-        if (listener) {
-          listener(target as S)
+      if (_subscriberCallbacks.has(obj)) {
+        const deps = _dependencies.get(obj)
+        if (deps && deps.has(key)) {
+          const listener = _subscriberCallbacks.get(obj)
+          if (listener) {
+            try {
+              effect(() => listener(target))
+            } catch (error) {
+              console.error('Error in listener callback:', error)
+            }
+          }
         }
       }
     })
@@ -112,6 +94,6 @@ export default function SubscribeManager<S extends object>(getActiveEffect: () =
     subscribe,
     unsubscribe,
     trackListeners,
-    notifyListeners,
+    notifyListeners
   }
 }

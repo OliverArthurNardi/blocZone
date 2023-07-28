@@ -41,7 +41,7 @@ describe('SubscribeManager', () => {
 
   })
 
-  test('shuld throw an error when trying to subscribe to a non-object', () => {
+  test('should throw an error when trying to subscribe to a non-object', () => {
     const target = 0
     const callback = jest.fn()
 

@@ -74,18 +74,24 @@ export default function SubscribeManager<S extends object>() {
 
   const notifyListeners = (target: S, key: TargetKeys<S>) => {
     _listenerKeys.forEach((obj) => {
-      if (_subscriberCallbacks.has(obj)) {
-        const deps = _dependencies.get(obj)
-        if (deps && deps.has(key)) {
-          const listener = _subscriberCallbacks.get(obj)
-          if (listener) {
-            try {
-              effect(() => listener(target))
-            } catch (error) {
-              console.error('Error in listener callback:', error)
-            }
-          }
-        }
+      if (!_subscriberCallbacks.has(obj)) {
+        return
+      }
+
+      const deps = _dependencies.get(obj)
+      if (!deps || !deps.has(key)) {
+        return
+      }
+
+      const listener = _subscriberCallbacks.get(obj)
+      if (!listener) {
+        return
+      }
+
+      try {
+        effect(() => listener(target))
+      } catch (error) {
+        console.error('Error in listener callback:', error)
       }
     })
   }

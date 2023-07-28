@@ -1,4 +1,4 @@
-import type { Subscription } from '../../types'
+import type { Subscription, TargetKeys } from '../../types'
 
 /**
  * Create subscription manager with the given active effect.
@@ -36,7 +36,7 @@ export default function SubscribeManager<S extends object>(getActiveEffect: () =
    * @param key - The key in the target object.
    * @param callback - The callback function.
    */
-  const subscribe = (target: object, key: string, callback: Subscription<S>) => {
+  const subscribe = (target: object, key: TargetKeys<S>, callback: Subscription<S>) => {
     handleSubscriptionExceptions(target)
 
     if (!_dependencies.has(target)) {
@@ -54,7 +54,7 @@ export default function SubscribeManager<S extends object>(getActiveEffect: () =
    * @param target - The target object.
    * @param key - The key in the target object.
    */
-  const unsubscribe = (target: object, key: string) => {
+  const unsubscribe = (target: object, key: TargetKeys<S>) => {
     if (typeof target !== 'object' || target === null || !_subscriberCallbacks.has(target)) {
       throw new Error(`Cannot unsubscribe from a non-subscribed object. Received value of type ${typeof target}`)
     }
@@ -75,7 +75,7 @@ export default function SubscribeManager<S extends object>(getActiveEffect: () =
    * @param target - The target object.
    * @param key - The key in the target object.
    */
-  const trackListeners = (target: object, key: string) => {
+  const trackListeners = (target: object, key: TargetKeys<S>) => {
     if (!target || typeof target !== 'object') {
       console.error(`Track listeners called with invalid target: ${target}, target must be an object`)
     }
@@ -96,7 +96,7 @@ export default function SubscribeManager<S extends object>(getActiveEffect: () =
    * @param target - The target object.
    * @param key - The key in the target object.
    */
-  const notifyListeners = (target: object, key: string) => {
+  const notifyListeners = (target: object, key: TargetKeys<S>) => {
     _listenerKeys.forEach((obj) => {
       const deps = _dependencies.get(obj)
       if (deps && deps.has(key as keyof S)) {

@@ -18,7 +18,9 @@ export default function createBlocState<S extends object>(initialState: S) {
 
   const activeEffect: Subscription<S> | null = null
 
-  const manager = SubscribeManager(() => activeEffect)
+  const getActiveEffect = () => activeEffect
+
+  const manager = SubscribeManager(getActiveEffect)
 
   return new Proxy(initialState, {
     get: (target, key: string) => {

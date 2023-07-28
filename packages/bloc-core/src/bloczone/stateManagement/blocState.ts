@@ -10,7 +10,7 @@ import type { Subscription } from '../../types'
  * @returns The created bloc state.
  *
  */
-export function createBlocState<S extends object>(initialState: S) {
+export default function createBlocState<S extends object>(initialState: S) {
   if (typeof initialState !== 'object' || initialState === null) {
     throw new Error(`Bloc state must be an object, got ${typeof initialState}`)
   }

@@ -9,7 +9,7 @@ import type { Subscription } from '../../types'
  *
  * @returns The created subscription manager.
  */
-export function SubscribeManager<S extends object>(getActiveEffect: () => Subscription<S> | null) {
+export default function SubscribeManager<S extends object>(getActiveEffect: () => Subscription<S> | null) {
   const _subscriberCallbacks = new WeakMap<object, Subscription<S>>()
   const _listenerKeys = new Set<object>()
   const _dependencies = new WeakMap<object, Set<keyof S>>()

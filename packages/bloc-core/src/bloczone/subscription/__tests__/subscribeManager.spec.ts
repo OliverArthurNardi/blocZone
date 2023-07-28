@@ -1,6 +1,6 @@
 import { describe, test, expect, jest, beforeEach } from '@jest/globals'
 
-import { SubscribeManager } from '../subscribeManager'
+import SubscribeManager from '../subscribeManager'
 import type { Subscription } from '../../../types'
 
 describe('SubscribeManager', () => {

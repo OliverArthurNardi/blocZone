@@ -1,6 +1,6 @@
 import { describe, test, expect, jest } from '@jest/globals'
 
-import { createBlocState } from '../blocState'
+import createBlocState from '../blocState'
 
 describe('createBlocState', () => {
   test('throws error for non-object initial state', () => {

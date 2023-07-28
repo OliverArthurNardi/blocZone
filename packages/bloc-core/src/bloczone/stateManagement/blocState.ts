@@ -33,9 +33,10 @@ export function createBlocState<S extends object>(initialState: S) {
   }
 
   const trackListeners = (target: object, key: keyof S) => {
-
     if (!target || typeof target !== 'object') {
-      console.error(`Track listeners called with invalid target: ${target}, target must be an object`)
+      console.error(
+        `Track listeners called with invalid target: ${target}, target must be an object`
+      )
     }
 
     if (activeEffect) {

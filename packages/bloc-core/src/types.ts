@@ -1,6 +1,7 @@
 export type EventMap = Record<string, unknown>
 export type EventReceiver<T = unknown> = (payload: T) => void
 export type Subscription<S> = (state: S) => void
+export type TargetKeys<S> = Record<keyof S, Subscription<S>[]>
 export type Dispatch<P = unknown> = (event: string, payload: P) => void
 export type MiddlewareFunction<S> = (
   state: S,

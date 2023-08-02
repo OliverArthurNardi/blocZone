@@ -30,8 +30,7 @@ export default class CounterElement extends HTMLElement {
 		counter.textContent = 'increment me'
 
 		counter.addEventListener('click', () => {
-			const currentCount = blocCounter.getState().count
-			blocCounter.setState({ count: currentCount + 1 })
+      blocCounter.state.setState('increment', 'count', blocCounter.state.value.count +1)
 		})
 
 		shadow.appendChild(style)

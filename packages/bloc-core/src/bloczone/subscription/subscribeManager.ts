@@ -8,11 +8,8 @@ import type { Subscription, TargetKeys } from '../../types'
  * @returns The created subscription manager.
  */
 export default function SubscribeManager<S extends object>() {
-  /** @type {WeakMap<object, Subscription<S>>} Mapping of object keys to listener functions */
-  const _subscriberCallbacks = new WeakMap<S, Subscription<S>>()
-  /** @type {Set<object>} Set of objects that are subscribed to this Bloc */
+  const _subscriberCallbacks = new WeakMap<S, Set<Subscription<S>>>()
   const _listenerKeys = new Set<S>()
-  /** @type {WeakMap<object, Set<keyof S>>} Mapping of object keys to the properties they are subscribed to */
   const _dependencies = new WeakMap<S, Set<TargetKeys<S>>>()
 
   let activeEffect: Subscription<S> | null = null
@@ -38,16 +35,29 @@ export default function SubscribeManager<S extends object>() {
   const subscribe = (target: S, key: TargetKeys<S>, callback: Subscription<S>) => {
     handleSubscriptionExceptions(target)
 
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`--- ENABLE SUBSCRIPTION DEBUGGING, NOT FOR PRODUCTION ---`)
+      console.info(
+        `[SubscribeManager] new subscription registered for object: ${JSON.stringify(
+          target
+        )} and key: ${key}`
+      )
+    }
+
     if (!_dependencies.has(target)) {
       _dependencies.set(target, new Set())
     }
 
+    if (!_subscriberCallbacks.has(target)) {
+      _subscriberCallbacks.set(target, new Set())
+    }
+
     _dependencies.get(target)!.add(key)
-    _subscriberCallbacks.set(target, callback)
+    _subscriberCallbacks.get(target)!.add(callback)
     _listenerKeys.add(target)
   }
 
-  const unsubscribe = (target: S, key: TargetKeys<S>) => {
+  const unsubscribe = (target: S, key: TargetKeys<S>, callback: Subscription<S>) => {
     if (typeof target !== 'object' || target === null || !_subscriberCallbacks.has(target)) {
       throw new Error(`Cannot unsubscribe. Invalid target received of type ${typeof target}`)
     }
@@ -55,7 +65,10 @@ export default function SubscribeManager<S extends object>() {
     const dependencies = _dependencies.get(target)!
     dependencies.delete(key)
 
-    if (dependencies.size === 0) {
+    const callbacks = _subscriberCallbacks.get(target)!
+    callbacks.delete(callback)
+
+    if (dependencies.size === 0 && callbacks.size === 0) {
       _dependencies.delete(target)
       _subscriberCallbacks.delete(target)
       _listenerKeys.delete(target)
@@ -83,16 +96,18 @@ export default function SubscribeManager<S extends object>() {
         return
       }
 
-      const listener = _subscriberCallbacks.get(obj)
-      if (!listener) {
+      const listeners = _subscriberCallbacks.get(obj)
+      if (!listeners) {
         return
       }
 
-      try {
-        effect(() => listener(target))
-      } catch (error) {
-        console.error('Error in listener callback:', error)
-      }
+      listeners.forEach((listener) => {
+        try {
+          effect(() => listener(target))
+        } catch (error) {
+          console.error('Error in listener callback:', error)
+        }
+      })
     })
   }
 

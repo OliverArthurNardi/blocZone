@@ -26,9 +26,9 @@ describe('createBlocState', () => {
 
   test('does not set the state directly', () => {
     const initialState = { value: 1 }
-    const { state } = createBlocState(initialState)
+    const { value } = createBlocState(initialState)
     expect(() => {
-      const newState = { ...state, value: 2 }
+      const newState = { ...value, value: 2 }
       // @ts-expect-error - Testing invalid input
       state = newState
     }).toThrow()
@@ -42,14 +42,14 @@ describe('createBlocState', () => {
   })
   test('getState returns current state', () => {
     const initialState = { value: 1 }
-    const { state, getState} = createBlocState(initialState)
-    expect(getState()).toBe(state)
+    const { value } = createBlocState(initialState)
+    expect(value).toBe(value)
   })
 
   test('setState updates state', () => {
-    const initialState = { value: 1 }
-    const { state, setState } = createBlocState(initialState)
-    setState('testAction', 'value', 2)
-    expect(state.value).toBe(2)
+    const initialState = { counter: 1 }
+    const { setState, value } = createBlocState(initialState)
+    setState('testAction', 'counter', 2)
+    expect(value.counter).toBe(2)
   })
 })

@@ -1,8 +1,9 @@
 import { useBloc } from '@bloczone/core/src/bloczone'
 
-const blocCounter = useBloc<{ count: number }>('COUNTER')
+const blocCounter = useBloc('COUNTER')
 
 let state: HTMLElement
+let callback: (newState: {count: number}) => void
 
 export default class StateDisplayedElement extends HTMLElement {
   constructor() {
@@ -27,26 +28,25 @@ export default class StateDisplayedElement extends HTMLElement {
 
     state = document.createElement('div')
     state.className = 'state'
+    state.textContent = `${blocCounter.state.value.count}`
 
     shadow.appendChild(style)
     shadow.appendChild(state)
-  }
 
-  connectedCallback() {
-    if (blocCounter) {
-      blocCounter.subscribe(
-        this,
-        (nextState) => {
-          state.textContent = `${nextState.count}`
-        },
-        ['count']
-      )
+    callback = (newState: {count: number}) => {
+      state.textContent = `${newState.count}`
     }
   }
 
+  connectedCallback() {
+    console.log("connectedCallback called");
+    blocCounter.manager.subscribe(blocCounter.state, 'value.count', callback)
+  }
+
+
   disconnectedCallback() {
     if (blocCounter) {
-      blocCounter.unsubscribe(this)
+      blocCounter.unsubscribe(blocCounter.state, 'value.count', callback)
     }
   }
 }

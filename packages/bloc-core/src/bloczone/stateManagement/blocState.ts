@@ -16,28 +16,34 @@ export default function createBlocState<S extends object>(initialState: S) {
     throw new Error(`initialState must be an object, got ${typeof initialState}`)
   }
 
-  const manager = SubscribeManager()
+  const _manager = SubscribeManager()
 
   const state = new Proxy(initialState, {
     // Track listeners when a property is accessed
     get: (target, key: string) => {
       const value = Reflect.get(target, key)
-      manager.trackListeners(target, key)
+      _manager.trackListeners(target, key)
       return value
     },
     // Update property and notify listeners when a property is set
     set: (target, key: string, value) => {
+      console.log(`Setting value via Proxy: ${key} => ${value}`);
       const oldValue = Reflect.get(target, key)
       Reflect.set(target, key, value)
       if (oldValue !== value) {
-        manager.notifyListeners(target, key)
+        _manager.notifyListeners(target, key)
       }
       return true
     }
   })
 
   const setState = (action: string, key: keyof S, value: unknown) => {
-    console.info(`[BlocState] Action: ${action}, Key: ${String(key)}, Value: ${value}`)
+    // TODO: remove this after creating a better solution, eg: a debug devtool.
+    console.log(`Setting value via setState: ${String(key)} => ${value}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`--- ENABLE BLOC STATE DEBUGGING, NOT FOR PRODUCTION ---`)
+      console.info(`[BlocState] Action: ${action}, Key: ${String(key)}, Value: ${value}`)
+    }
 
     // Ensure key exists in initialState
     if (!Reflect.has(initialState, key)) {
@@ -45,14 +51,13 @@ export default function createBlocState<S extends object>(initialState: S) {
     }
 
     Reflect.set(state, key, value)
-    manager.notifyListeners(state, key)
+    _manager.notifyListeners(state, key)
   }
 
-  const getState = (): S => state
-
   return {
-    state,
-    setState,
-    getState
+    get value() {
+      return state
+    },
+    setState
   } as const
 }
